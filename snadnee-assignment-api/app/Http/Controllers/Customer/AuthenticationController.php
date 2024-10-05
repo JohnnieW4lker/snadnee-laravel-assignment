@@ -7,6 +7,7 @@ use App\Http\Requests\User\UserRegisterRequest;
 use App\Http\Resources\User\MeResource;
 use App\Services\AuthenticationService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -18,9 +19,9 @@ class AuthenticationController extends Controller
     {
     }
 
-    public function me(): MeResource
+    public function me(Request $request): MeResource
     {
-        return $this->authenticationService->getCurrentUserInfo();
+        return $this->authenticationService->getUserInfo($request->user());
     }
 
     public function register(UserRegisterRequest $registerRequest): MeResource
@@ -33,9 +34,9 @@ class AuthenticationController extends Controller
         return $this->authenticationService->handleLogin($userLoginRequest);
     }
 
-    public function logout(): JsonResponse
+    public function logout(Request $request): JsonResponse
     {
-        $this->authenticationService->handleLogout();
+        $this->authenticationService->handleLogout($request);
 
         return response()->json(null, Response::HTTP_OK);
     }

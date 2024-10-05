@@ -2,14 +2,22 @@
 
 namespace App\Providers;
 
+use App\Models\Reservation;
+use App\Policies\ReservationsPolicy;
 use App\Services\AuthenticationService;
 use App\Services\ReservationService;
 use App\Services\TableRepository;
 use App\Services\TableService;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Facades\Gate;
 
 class AppServiceProvider extends ServiceProvider
 {
+    public function boot(): void
+    {
+        Gate::policy(Reservation::class, ReservationsPolicy::class);
+    }
+
     public function register(): void
     {
         $this->app->singleton(AuthenticationService::class);

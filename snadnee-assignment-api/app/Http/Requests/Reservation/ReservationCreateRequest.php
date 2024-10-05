@@ -14,11 +14,10 @@ class ReservationCreateRequest extends FormRequest
      */
     public function rules(): array
     {
-
         return [
             'reservationDateTime' => 'required|date|after:tomorrow',
             'peopleCount' => 'required|integer|min:1',
-            'reservationLengthInMinutes' => 'required|integer|min:30|multiple_of:30',
+            'reservationLengthInMinutes' => 'required|integer|min:30|max:120|multiple_of:30',
             'guestFirstName' => 'required|string|max:32',
             'guestLastName' => 'required|string|max:32',
             'tableId' => [

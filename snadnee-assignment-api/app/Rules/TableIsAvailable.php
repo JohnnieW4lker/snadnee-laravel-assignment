@@ -4,9 +4,9 @@ namespace App\Rules;
 
 use App\Models\Table;
 use App\Services\TableRepository;
+use Carbon\Carbon;
 use Closure;
 use Illuminate\Contracts\Validation\ValidationRule;
-use Illuminate\Support\Facades\DB;
 
 class TableIsAvailable implements ValidationRule
 {
@@ -26,18 +26,14 @@ class TableIsAvailable implements ValidationRule
             $fail('Table does not exist');
         }
 
-        $reservationEndTime = new \DateTime($this->reservationDateTime);
-        $reservationLengthInterval = new \DateInterval('');
-        $reservationLengthInterval->i = $this->reservationLengthInMinutes;
-        $reservationEndTime->add($reservationLengthInterval);
-
-        $reservationEndTimeFormatted = $reservationEndTime->format(DATE_ATOM);
+        $reservationEndTime = Carbon::make($this->reservationDateTime)
+            ->addMinutes(intval($this->reservationLengthInMinutes));
 
         /** @var TableRepository $tableRepository */
         $tableRepository = app(TableRepository::class);
 
         if ($tableRepository
-            ->findOverlappingReservations($table, $this->reservationDateTime, $reservationEndTimeFormatted)
+            ->findOverlappingReservations($table, Carbon::make($this->reservationDateTime), $reservationEndTime)
             ->count() > 0) {
             $fail('Table is not available for selected time and duration.');
         }

@@ -15,7 +15,7 @@ class UserRegisterRequest extends FormRequest
         return [
             'firstName' => 'required|string|max:32',
             'lastName' => 'required|string|max:32',
-            'email' => 'required|email',
+            'email' => 'required|email|unique:App\Models\User,email',
             'phone' => 'required|regex:/^\+\d{1,3}\d{4,14}$/',
             'password' => [
                 'required',

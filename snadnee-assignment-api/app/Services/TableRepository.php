@@ -3,21 +3,28 @@
 namespace App\Services;
 
 use App\Enums\Reservation\ReservationStatusEnum;
+use App\Models\Reservation;
 use App\Models\Table;
+use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 
 class TableRepository
 {
-    public function findOverlappingReservations(Table $table, string $reservationStartTime, string $reservationEndTime): Collection
+    public function findOverlappingReservations(Table $table, CarbonInterface $reservationStartTime, CarbonInterface $reservationEndTime): Collection
     {
-        return DB::table(DB::raw('(SELECT *, DATE_ADD(reservation_date_time, INTERVAL reservation_length_in_minutes MINUTE) as finish_time FROM reservations) as subquery'))
-            ->where('subquery.table_id', '=', $table->id)
-            ->where('subquery.status', '=', ReservationStatusEnum::ACTIVE->value)
-            ->where(function ($query) use ($reservationStartTime, $reservationEndTime) {
-                $query->where('subquery.reservation_date_time', '<=', $reservationEndTime)
-                    ->orWhere('subquery.finish_time', '>=', $reservationStartTime);
-            })
+        $now = Carbon::now()->setHour(0)->setMinute(0)->setSecond(0)->toAtomString();
+        $reservations = Reservation::query()
+            ->where('table_id', '=', $table->id)
+            ->where('status', '=', ReservationStatusEnum::ACTIVE)
+            ->where('reservation_date_time', '>=', $now)
             ->get();
+
+        return $reservations->filter(function (Reservation $reservation) use ($reservationStartTime, $reservationEndTime) {
+            $filteredReservationStartTime = Carbon::make($reservation->reservation_date_time);
+            $filteredReservationEndTime = Carbon::make($reservation->reservation_date_time)->addMinutes($reservation->reservation_length_in_minutes);
+
+            return $reservationStartTime < $filteredReservationEndTime && $reservationEndTime > $filteredReservationStartTime;
+        });
     }
 }

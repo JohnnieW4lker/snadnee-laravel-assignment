@@ -15,10 +15,10 @@ class ReservationResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'reservationDateTime' => $this->reservationDateTime,
-            'peopleCount' => $this->peopleCount,
-            'guestFirstName' => $this->guestFirstName,
-            'guestLastName' => $this->guestLastName,
+            'reservationDateTime' => $this->reservation_date_time,
+            'peopleCount' => $this->people_count,
+            'guestFirstName' => $this->guest_first_name,
+            'guestLastName' => $this->guest_last_name,
             'status' => $this->status,
         ];
     }

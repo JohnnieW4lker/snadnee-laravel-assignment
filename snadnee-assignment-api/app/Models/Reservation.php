@@ -12,24 +12,28 @@ class Reservation extends Model
 {
     use HasFactory;
 
+    public $timestamps = true;
+
     /**
      * @var array<int, string>
      */
     protected $fillable = [
-        'reservationDateTime',
-        'reservationLengthInMinutes',
-        'peopleCount',
-        'guestFirstName',
-        'guestLastName',
-        'status,'
+        'reservation_date_time',
+        'reservation_length_in_minutes',
+        'people_count',
+        'guest_first_name',
+        'guest_last_name',
+        'status',
+        'table_id',
+        'user_id',
     ];
 
     protected function casts(): array
     {
         return [
-            'reservationDateTime' => 'datetime',
-            'peopleCount' => 'integer',
-            'reservationLengthInMinutes' => 'integer',
+            'reservation_date_time' => 'datetime',
+            'people_count' => 'integer',
+            'reservation_length_in_minutes' => 'integer',
         ];
     }
 
@@ -43,11 +47,11 @@ class Reservation extends Model
 
     public function user(): BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'id');
     }
 
     public function table(): BelongsTo
     {
-        return $this->belongsTo(Table::class);
+        return $this->belongsTo(Table::class, 'id');
     }
 }

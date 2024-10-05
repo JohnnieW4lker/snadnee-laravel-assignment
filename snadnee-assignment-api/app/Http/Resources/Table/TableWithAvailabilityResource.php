@@ -4,6 +4,7 @@ namespace App\Http\Resources\Table;
 
 use App\Enums\Table\TableAvailabilityEnum;
 use App\Services\TableRepository;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -26,10 +27,16 @@ class TableWithAvailabilityResource extends JsonResource
     {
         $tableRepository = app(TableRepository::class);
 
-        $reservationOverlaps = $tableRepository->findOverlappingReservations($this->resource, $this->reservationStartDate, $this->reservationLengthInMinutes);
+        $reservationOverlaps = $tableRepository
+            ->findOverlappingReservations(
+                $this->resource,
+                Carbon::make($this->reservationStartDate),
+                Carbon::make($this->reservationStartDate)->addMinutes($this->reservationLengthInMinutes)
+            );
         $availability = $reservationOverlaps->count() > 0 ? TableAvailabilityEnum::RESERVED : TableAvailabilityEnum::AVAILABLE;
 
         return [
+            'id' => $this->id,
             'number' => $this->number,
             'chairs' => $this->chairs,
             'availability' => $availability->value,

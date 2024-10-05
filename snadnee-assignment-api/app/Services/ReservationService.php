@@ -8,7 +8,9 @@ use App\Http\Resources\Reservation\ReservationResource;
 use App\Models\Reservation;
 use App\Models\Table;
 use App\Models\User;
+use Carbon\Carbon;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Symfony\Component\HttpFoundation\Response;
 
 class ReservationService
 {
@@ -17,22 +19,28 @@ class ReservationService
     {
         /** @var User $user */
         $user = auth()->user();
+        $now = Carbon::now()->setHour(0)->setMinute(0)->setSecond(0)->toAtomString();
 
-        return ReservationResource::collection($user->reservations());
+        return ReservationResource::collection(
+            $user->reservations()
+                ->where('status', '=', ReservationStatusEnum::ACTIVE)
+                ->where('reservation_date_time', '>=', $now)->get()
+        );
     }
 
     public function createNewReservation(ReservationCreateRequest $reservationCreateRequest): ReservationResource
     {
-        /** @var Table $table */
-        $table = Table::find($reservationCreateRequest->validated('tableId'));
+        $table = Table::query()->find($reservationCreateRequest->validated('tableId'))->first();
+        $currentUser = $reservationCreateRequest->user();
 
         $reservation = Reservation::create([
-            'reservationDateTime' => $reservationCreateRequest->validated('reservationDateTime'),
-            'peopleCount' => $reservationCreateRequest->validated('peopleCount'),
-            'reservationLengthInMinutes' => $reservationCreateRequest->validated('reservationLengthInMinutes'),
-            'guestFirstName' => $reservationCreateRequest->validated('guestFirstName'),
-            'guestLastName' => $reservationCreateRequest->validated('guestLastName'),
-            'table' => $table,
+            'reservation_date_time' => $reservationCreateRequest->validated('reservationDateTime'),
+            'people_count' => $reservationCreateRequest->validated('peopleCount'),
+            'reservation_length_in_minutes' => $reservationCreateRequest->validated('reservationLengthInMinutes'),
+            'guest_first_name' => $reservationCreateRequest->validated('guestFirstName'),
+            'guest_last_name' => $reservationCreateRequest->validated('guestLastName'),
+            'table_id' => $table->id,
+            'user_id' => $currentUser->id,
             'status' => ReservationStatusEnum::ACTIVE,
         ]);
 
@@ -41,6 +49,10 @@ class ReservationService
 
     public function cancelReservation(Reservation $reservation): void
     {
+        if ($reservation->status === ReservationStatusEnum::CANCELLED) {
+            abort(Response::HTTP_NOT_FOUND, 'Reservation not found.');
+        }
+
         $reservation->status = ReservationStatusEnum::CANCELLED;
         $reservation->save();
     }
