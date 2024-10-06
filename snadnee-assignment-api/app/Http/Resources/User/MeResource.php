@@ -7,15 +7,22 @@ use Illuminate\Http\Resources\Json\JsonResource;
 
 class MeResource extends JsonResource
 {
+    private string $accessToken;
+
+    public function __construct($resource, string $accessToken)
+    {
+        parent::__construct($resource);
+        $this->accessToken = $accessToken;
+    }
+
     public function toArray(Request $request): array
     {
-
         return [
-            'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
+            'firstName' => $this->first_name,
+            'lastName' => $this->last_name,
             'email' => $this->email,
             'phone' => $this->phone,
-            'access_token' => $this->tokens()->where('name', '=', 'access')->first()->token,
+            'accessToken' => $this->accessToken,
         ];
     }
 }

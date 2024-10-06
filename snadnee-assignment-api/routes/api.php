@@ -23,9 +23,6 @@ Route::controller(TableController::class)->group(function () {
 
 Route::controller(AuthenticationController::class)->group(function () {
     Route::prefix('auth')->group(function () {
-        Route::get('/me', 'me')
-            ->middleware('auth:sanctum')
-            ->middleware(AllowAuthenticatedOnly::class);
         Route::post('/register', 'register')->middleware(AllowAnonymousOnly::class);
         Route::post('/login', 'login')->middleware(AllowAnonymousOnly::class);
         Route::post('/logout', 'logout')

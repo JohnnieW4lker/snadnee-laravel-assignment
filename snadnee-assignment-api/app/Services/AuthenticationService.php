@@ -13,9 +13,9 @@ use Symfony\Component\HttpFoundation\Response;
 class AuthenticationService
 {
 
-    public function getUserInfo(User $user): MeResource
+    public function getUserInfo(User $user, string $token): MeResource
     {
-        return MeResource::make($user);
+        return new MeResource($user, $token);
     }
 
     public function registerNewUser(UserRegisterRequest $registerRequest): MeResource
@@ -25,12 +25,11 @@ class AuthenticationService
             'first_name' => $registerRequest->validated('firstName'),
             'last_name' => $registerRequest->validated('lastName'),
             'email' => $registerRequest->validated('email'),
-            'phone' => $registerRequest->validated('email'),
+            'phone' => $registerRequest->validated('phone'),
             'password' => bcrypt($registerRequest->validated('password')),
         ]);
-        $user->createToken('access');
 
-        return $this->getUserInfo($user);
+        return $this->getUserInfo($user, $user->createToken('access')->plainTextToken);
     }
 
     public function handleLogin(UserLoginRequest $userLoginRequest): MeResource
@@ -40,9 +39,8 @@ class AuthenticationService
         if (!$user || !Hash::check($userLoginRequest->validated('password'), $user->password)) {
             abort(Response::HTTP_UNAUTHORIZED);
         }
-        $user->createToken('access');
 
-        return $this->getUserInfo($user);
+        return $this->getUserInfo($user, $user->createToken('access')->plainTextToken);
     }
 
     public function handleLogout(Request $request): void

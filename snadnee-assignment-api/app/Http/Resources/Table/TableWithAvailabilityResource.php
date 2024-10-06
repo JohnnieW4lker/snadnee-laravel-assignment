@@ -38,7 +38,7 @@ class TableWithAvailabilityResource extends JsonResource
         return [
             'id' => $this->id,
             'number' => $this->number,
-            'chairs' => $this->chairs,
+            'seats' => $this->seats,
             'availability' => $availability->value,
         ];
     }

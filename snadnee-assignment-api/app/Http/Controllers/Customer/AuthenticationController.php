@@ -19,11 +19,6 @@ class AuthenticationController extends Controller
     {
     }
 
-    public function me(Request $request): MeResource
-    {
-        return $this->authenticationService->getUserInfo($request->user());
-    }
-
     public function register(UserRegisterRequest $registerRequest): MeResource
     {
         return $this->authenticationService->registerNewUser($registerRequest);

@@ -30,7 +30,6 @@ class ReservationService
 
     public function createNewReservation(ReservationCreateRequest $reservationCreateRequest): ReservationResource
     {
-        $table = Table::query()->find($reservationCreateRequest->validated('tableId'))->first();
         $currentUser = $reservationCreateRequest->user();
 
         $reservation = Reservation::create([
@@ -39,7 +38,7 @@ class ReservationService
             'reservation_length_in_minutes' => $reservationCreateRequest->validated('reservationLengthInMinutes'),
             'guest_first_name' => $reservationCreateRequest->validated('guestFirstName'),
             'guest_last_name' => $reservationCreateRequest->validated('guestLastName'),
-            'table_id' => $table->id,
+            'table_id' => $reservationCreateRequest->validated('tableId'),
             'user_id' => $currentUser->id,
             'status' => ReservationStatusEnum::ACTIVE,
         ]);

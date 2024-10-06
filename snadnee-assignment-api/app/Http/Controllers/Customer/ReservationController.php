@@ -8,6 +8,7 @@ use App\Http\Resources\Reservation\ReservationResource;
 use App\Models\Reservation;
 use App\Services\ReservationService;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\Gate;
@@ -23,7 +24,7 @@ class ReservationController extends Controller
         $this->middleware('auth:sanctum');
     }
 
-    public function listReservations(): AnonymousResourceCollection
+    public function listReservations(Request $request): AnonymousResourceCollection
     {
         return $this->reservationService->getReservationsForCurrentUser();
     }
