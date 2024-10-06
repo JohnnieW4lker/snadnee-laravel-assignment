@@ -7,7 +7,7 @@ services:
     volumes:
       - ./snadnee-assignment-fe:/app
       - /app/node_modules
-    command: sh -c "npm ci && npm run serve"
+    command: sh -c "npm ci && npm run build:prod && npm run serve"
     ports:
       - "8080:8080"
     networks:
@@ -18,25 +18,13 @@ services:
       context: ./docker-conf/php-fpm
       dockerfile: Dockerfile
     working_dir: /var/www
-    command: sh -c "php artisan migrate:fresh && php artisan db:seed && php-fpm"
+    command: sh -c "composer install && php artisan migrate:fresh && php artisan db:seed && php-fpm"
     volumes:
       - ./snadnee-assignment-api:/var/www
     networks:
       - app-network
     depends_on:
       - db
-      - composer
-
-  composer:
-    image: composer:latest
-    networks:
-      - app-network
-    ports:
-      - "9002:9000"
-    volumes:
-      - "./snadnee-assignment-api:/snadnee-assignment-api"
-    working_dir: /snadnee-assignment-api
-    command: install
 
   db:
     image: mysql:8.4.2
