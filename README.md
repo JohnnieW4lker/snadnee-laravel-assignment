@@ -28,5 +28,5 @@ Back end: http://localhost:8083
 
 First build can take a while!
 ## Testing
-You can run tests in container using `docker exec -it snadnee-laravel-assignment-php_api-1 ./vendor/bin/phpunit`
-or in local system with installed PHP using `.snadnee-assignment-api/vendor/bin/phpunit`
+You can run tests in container using `docker compose exec php_api ./vendor/bin/phpunit`
+or in local system with installed PHP using `./snadnee-assignment-api/vendor/bin/phpunit`
