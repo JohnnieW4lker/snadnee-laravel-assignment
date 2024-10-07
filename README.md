@@ -22,8 +22,8 @@ red able by selecting next day 18:30.
 Whole infrastructure can be started by simple `docker compose up` command. Docker build handles
 server setup, vendor installation, database migration, database seeding and front end building.
 
-You can access adminer at http://localhost:8081\
-Front end: http://localhost:8080\
+You can access adminer at http://localhost:8081 \
+Front end: http://localhost:8080 \
 Back end: http://localhost:8083
 
 First build can take a while!
